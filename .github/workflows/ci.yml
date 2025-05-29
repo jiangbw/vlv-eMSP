@@ -1,0 +1,93 @@
+name: Java CI with Maven
+
+on:
+  push:
+    branches: [ main, develop ]
+  pull_request:
+    branches: [ main, develop ]
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    services:
+      postgres:
+        image: postgres:15
+        env:
+          POSTGRES_DB: emsp
+          POSTGRES_USER: postgres
+          POSTGRES_PASSWORD: postgres
+        ports:
+          - 5432:5432
+        options: >-
+          --health-cmd pg_isready
+          --health-interval 10s
+          --health-timeout 5s
+          --health-retries 5
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Set up JDK 17
+        uses: actions/setup-java@v4
+        with:
+          java-version: '17'
+          distribution: 'temurin'
+          cache: 'maven'
+
+      - name: Build and test with Maven
+        run: mvn clean package
+        env:
+          SPRING_DATASOURCE_URL: jdbc:postgresql://localhost:5432/emsp
+          SPRING_DATASOURCE_USERNAME: postgres
+          SPRING_DATASOURCE_PASSWORD: postgres
+
+      - name: Run SonarCloud analysis
+        if: ${{ github.event_name == 'pull_request' || github.ref == 'refs/heads/main' }}
+        uses: sonarsource/sonarcloud-github-action@master
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
+
+      - name: Build Docker image
+        run: |
+          docker build -t emsp-service:ci-${{ github.sha }} .
+
+      - name: Run integration tests
+        run: mvn failsafe:integration-test
+        env:
+          SPRING_PROFILES_ACTIVE: test
+          SPRING_DATASOURCE_URL: jdbc:postgresql://localhost:5432/emsp
+          SPRING_DATASOURCE_USERNAME: postgres
+          SPRING_DATASOURCE_PASSWORD: postgres
+
+      - name: Upload test results
+        uses: actions/upload-artifact@v4
+        if: ${{ always() }}
+        with:
+          name: test-results
+          path: |
+            **/surefire-reports
+            **/failsafe-reports
+            **/jacoco-report
+
+      - name: Upload Docker image to GitHub Packages
+        if: ${{ github.ref == 'refs/heads/main' && github.event_name == 'push' }}
+        uses: docker/build-push-action@v5
+        with:
+          context: .
+          push: true
+          tags: |
+            ghcr.io/${{ github.repository_owner }}/emsp-service:latest
+            ghcr.io/${{ github.repository_owner }}/emsp-service:${{ github.sha }}
+          cache-from: type=gha
+          cache-to: type=gha,mode=max
+
+      - name: Notify Slack on failure
+        if: ${{ failure() }}
+        uses: slackapi/slack-github-action@v1.26.0
+        with:
+          channel-id: 'C12345678' # 替换为你的 Slack 频道 ID
+          slack-message: "Build failed: ${{ github.repository }}#${{ github.run_id }}"
+        env:
+          SLACK_BOT_TOKEN: ${{ secrets.SLACK_BOT_TOKEN }}
