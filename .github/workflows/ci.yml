@@ -50,8 +50,6 @@ jobs:
           SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
         with:
           args: >
-#            -Dsonar.projectKey=${{ secrets.SONAR_PROJECT_KEY }}
-#            -Dsonar.organization=${{ secrets.SONAR_ORGANIZATION }}
             -Dsonar.ci.autoconfig.disabled=true
             -Dsonar.analysis.autoconfig.disabled=true
             -Dsonar.scm.provider=git
