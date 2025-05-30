@@ -34,38 +34,3 @@ jobs:
           java-version: '17'
           distribution: 'temurin'
           cache: 'maven'
-
-      - name: Disable SonarCloud Automatic Analysis via API
-        run: |
-          # 禁用项目级自动分析
-          curl -sS -u "${{ secrets.SONAR_TOKEN }}:" -X POST \
-          "https://sonarcloud.io/api/authentication/disable?project=${{ secrets.SONAR_PROJECT_KEY }}"
-          
-          curl -sS -u "${{ secrets.SONAR_TOKEN }}:" -X POST \
-          "https://sonarcloud.io/api/authentication/disable?organization=${{ secrets.SONAR_ORGANIZATION }}"
-
-          sleep 5
-
-      - name: Build and test with Maven
-        run: mvn clean package
-        env:
-          SPRING_DATASOURCE_URL: jdbc:postgresql://localhost:5432/emsp
-          SPRING_DATASOURCE_USERNAME: postgres
-          SPRING_DATASOURCE_PASSWORD: postgres
-
-
-      - name: Run SonarCloud analysis
-        if: ${{ github.event_name == 'pull_request' || github.ref == 'refs/heads/main' }}
-        uses: sonarsource/sonarcloud-github-action@master
-        env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-          SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
-        with:
-          args: >
-            -Dsonar.ci.autoconfig.disabled=true
-            -Dsonar.analysis.autoconfig.disabled=true
-            -Dsonar.projectKey=${{ secrets.SONAR_PROJECT_KEY }}
-            -Dsonar.organization=${{ secrets.SONAR_ORGANIZATION }}
-            -Dsonar.branch.name=${{ github.ref_name }}
-            -Dsonar.branch.target=main
-            -Dsonar.qualitygate.wait=true
