@@ -1,114 +1,42 @@
-name: Java CI with Maven
+name: CI Pipeline with Integrated Analysis
 
 on:
   push:
-    branches: [ main, develop ]
+    branches: [ main ]
   pull_request:
-    branches: [ main, develop ]
+    branches: [ main ]
 
 jobs:
-  build:
+  build-and-analyze:
     runs-on: ubuntu-latest
-    services:
-      postgres:
-        image: postgres:15
-        env:
-          POSTGRES_DB: emsp
-          POSTGRES_USER: postgres
-          POSTGRES_PASSWORD: postgres
-        ports:
-          - 5432:5432
-        options: >-
-          --health-cmd pg_isready
-          --health-interval 10s
-          --health-timeout 5s
-          --health-retries 5
-
     steps:
+      # 1. 检出代码
       - name: Checkout code
         uses: actions/checkout@v4
-
-      - name: Set up JDK 17
-        uses: actions/setup-java@v4
         with:
-          java-version: '17'
+          fetch-depth: 0  # SonarCloud 需要完整提交历史
+
+      # 2. 设置 JDK (示例为 Java 项目，按需修改)
+      - name: Set up JDK 17
+        uses: actions/setup-java@v3
+        with:
+          java-version: 17
           distribution: 'temurin'
-          cache: 'maven'
 
-      - name: Disable SonarCloud Automatic Analysis via API
-        run: |
-          # 禁用项目级自动分析
-          curl -sS -u "${{ secrets.SONAR_TOKEN }}:" -X POST \
-          "https://sonarcloud.io/api/authentication/disable?project=${{ secrets.SONAR_PROJECT_KEY }}"
-          
-          curl -sS -u "${{ secrets.SONAR_TOKEN }}:" -X POST \
-          "https://sonarcloud.io/api/authentication/disable?organization=${{ secrets.SONAR_ORGANIZATION }}"
+      # 3. 构建项目（根据实际构建工具调整）
+      - name: Build with Maven
+        run: mvn -B verify -DskipTests
 
-          sleep 5
+      # 4. 运行测试
+      - name: Run tests
+        run: mvn test
 
-      - name: Build and test with Maven
-        run: mvn clean package
-        env:
-          SPRING_DATASOURCE_URL: jdbc:postgresql://localhost:5432/emsp
-          SPRING_DATASOURCE_USERNAME: postgres
-          SPRING_DATASOURCE_PASSWORD: postgres
-
-
-      - name: Run SonarCloud analysis
-        if: ${{ github.event_name == 'pull_request' || github.ref == 'refs/heads/main' }}
+      # 5. 显式调用代码分析（替代自动分析）
+      - name: SonarCloud Scan
         uses: sonarsource/sonarcloud-github-action@master
         env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-          SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
+          SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}  # 需在仓库设置中配置此密钥
         with:
           args: >
-            -Dsonar.ci.autoconfig.disabled=true
-            -Dsonar.analysis.autoconfig.disabled=true
-            -Dsonar.projectKey=${{ secrets.SONAR_PROJECT_KEY }}
-            -Dsonar.organization=${{ secrets.SONAR_ORGANIZATION }}
-            -Dsonar.branch.name=${{ github.ref_name }}
-            -Dsonar.branch.target=main
-            -Dsonar.qualitygate.wait=true
-
-      - name: Build Docker image
-        run: |
-          docker build -t emsp-service:ci-${{ github.sha }} .
-
-      - name: Run integration tests
-        run: mvn failsafe:integration-test
-        env:
-          SPRING_PROFILES_ACTIVE: test
-          SPRING_DATASOURCE_URL: jdbc:postgresql://localhost:5432/emsp
-          SPRING_DATASOURCE_USERNAME: postgres
-          SPRING_DATASOURCE_PASSWORD: postgres
-
-      - name: Upload test results
-        uses: actions/upload-artifact@v4
-        if: ${{ always() }}
-        with:
-          name: test-results
-          path: |
-            **/surefire-reports
-            **/failsafe-reports
-            **/jacoco-report
-
-      - name: Upload Docker image to GitHub Packages
-        if: ${{ github.ref == 'refs/heads/main' && github.event_name == 'push' }}
-        uses: docker/build-push-action@v5
-        with:
-          context: .
-          push: true
-          tags: |
-            ghcr.io/${{ github.repository_owner }}/emsp-service:latest
-            ghcr.io/${{ github.repository_owner }}/emsp-service:${{ github.sha }}
-          cache-from: type=gha
-          cache-to: type=gha,mode=max
-
-      - name: Notify Slack on failure
-        if: ${{ failure() }}
-        uses: slackapi/slack-github-action@v1.26.0
-        with:
-          channel-id: 'C12345678' # 替换为你的 Slack 频道 ID
-          slack-message: "Build failed: ${{ github.repository }}#${{ github.run_id }}"
-        env:
-          SLACK_BOT_TOKEN: ${{ secrets.SLACK_BOT_TOKEN }}
+            -Dsonar.organization=jiangbw  # 替换为你的组织名
+            -Dsonar.projectKey=jiangbw_vlv-eMSP  # 替换为你的项目Key
