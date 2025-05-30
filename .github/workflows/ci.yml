@@ -52,9 +52,8 @@ jobs:
           args: >
             -Dsonar.ci.autoconfig.disabled=true
             -Dsonar.analysis.autoconfig.disabled=true
-            -Dsonar.scm.disabled=false
             -Dsonar.scm.provider=git
-            -Dsonar.autoconfig.disabled=true
+            -Dsonar.scm.disabled=false
             -Dsonar.projectKey=${{ secrets.SONAR_PROJECT_KEY }}
             -Dsonar.organization=${{ secrets.SONAR_ORGANIZATION }}
             -Dsonar.branch.name=${{ github.ref_name }}
@@ -62,6 +61,7 @@ jobs:
             -Dsonar.java.binaries=target/classes
             -Dsonar.coverage.jacoco.xmlReportPaths=target/site/jacoco/jacoco.xml
             -Dsonar.qualitygate.wait=true
+            -Dsonar.ci=GitHubActions
       - name: Build Docker image
         run: |
           docker build -t emsp-service:ci-${{ github.sha }} .
