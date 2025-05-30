@@ -54,7 +54,6 @@ jobs:
           SPRING_DATASOURCE_PASSWORD: postgres
 
 
-
       - name: Run SonarCloud analysis
         if: ${{ github.event_name == 'pull_request' || github.ref == 'refs/heads/main' }}
         uses: sonarsource/sonarcloud-github-action@master
@@ -65,17 +64,12 @@ jobs:
           args: >
             -Dsonar.ci.autoconfig.disabled=true
             -Dsonar.analysis.autoconfig.disabled=true
-            -Dsonar.analysis.mode=publish
-            -Dsonar.scm.provider=git
-            -Dsonar.scm.disabled=false
             -Dsonar.projectKey=${{ secrets.SONAR_PROJECT_KEY }}
             -Dsonar.organization=${{ secrets.SONAR_ORGANIZATION }}
             -Dsonar.branch.name=${{ github.ref_name }}
             -Dsonar.branch.target=main
-            -Dsonar.java.binaries=target/classes
-            -Dsonar.coverage.jacoco.xmlReportPaths=target/site/jacoco/jacoco.xml
             -Dsonar.qualitygate.wait=true
-            -Dsonar.ci=GitHubActions
+
       - name: Build Docker image
         run: |
           docker build -t emsp-service:ci-${{ github.sha }} .
