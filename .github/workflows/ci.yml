@@ -65,6 +65,7 @@ jobs:
           args: >
             -Dsonar.ci.autoconfig.disabled=true
             -Dsonar.analysis.autoconfig.disabled=true
+            -sonar.analysis.mode=publish
             -Dsonar.scm.provider=git
             -Dsonar.scm.disabled=false
             -Dsonar.projectKey=${{ secrets.SONAR_PROJECT_KEY }}
