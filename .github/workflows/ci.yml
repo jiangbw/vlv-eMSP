@@ -35,6 +35,17 @@ jobs:
           distribution: 'temurin'
           cache: 'maven'
 
+      - name: Disable SonarCloud Automatic Analysis via API
+        run: |
+          # 禁用项目级自动分析
+          curl -sS -u "${{ secrets.SONAR_TOKEN }}:" -X POST \
+          "https://sonarcloud.io/api/authentication/disable?project=${{ secrets.SONAR_PROJECT_KEY }}"
+          
+          curl -sS -u "${{ secrets.SONAR_TOKEN }}:" -X POST \
+          "https://sonarcloud.io/api/authentication/disable?organization=${{ secrets.SONAR_ORGANIZATION }}"
+
+          sleep 5
+
       - name: Build and test with Maven
         run: mvn clean package
         env:
@@ -42,18 +53,7 @@ jobs:
           SPRING_DATASOURCE_USERNAME: postgres
           SPRING_DATASOURCE_PASSWORD: postgres
 
-      - name: Disable SonarCloud Automatic Analysis via API
-        run: |
-          # 禁用项目级自动分析
-          curl -sS -u "${{ secrets.SONAR_TOKEN }}:" -X POST \
-          "https://sonarcloud.io/api/authentication/disable?project=${{ secrets.SONAR_PROJECT_KEY }}"
-          
-          # 禁用组织级自动分析
-          curl -sS -u "${{ secrets.SONAR_TOKEN }}:" -X POST \
-          "https://sonarcloud.io/api/authentication/disable?organization=${{ secrets.SONAR_ORGANIZATION }}"
-          
-          # 添加延迟确保设置生效
-          sleep 5
+
 
       - name: Run SonarCloud analysis
         if: ${{ github.event_name == 'pull_request' || github.ref == 'refs/heads/main' }}
