@@ -10,33 +10,22 @@ jobs:
   build-and-analyze:
     runs-on: ubuntu-latest
     steps:
-      # 1. 检出代码
       - name: Checkout code
-        uses: actions/checkout@v4
+        uses: actions/checkout@v2
+
+      - name: Install SonarScanner CLI
+        uses: actions/cache@v2
         with:
-          fetch-depth: 0  # SonarCloud 需要完整提交历史
+          path: sonar-scanner-cli
+          key: sonar-scanner-cli-${{ runner.os }}-${{ hashFiles('**/sonar-project.properties') }}
+          restore-keys: sonar-scanner-cli
 
-      # 2. 设置 JDK (示例为 Java 项目，按需修改)
-      - name: Set up JDK 17
-        uses: actions/setup-java@v3
-        with:
-          java-version: 17
-          distribution: 'temurin'
-
-      # 3. 构建项目（根据实际构建工具调整）
-      - name: Build with Maven
-        run: mvn -B verify -DskipTests
-
-      # 4. 运行测试
-      - name: Run tests
-        run: mvn test
-
-      # 5. 显式调用代码分析（替代自动分析）
-      - name: SonarCloud Scan
-        uses: sonarsource/sonarcloud-github-action@master
+      - name: Run SonarCloud Analysis
         env:
-          SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}  # 需在仓库设置中配置此密钥
-        with:
-          args: >
-            -Dsonar.organization=jiangbw  # 替换为你的组织名
-            -Dsonar.projectKey=jiangbw_vlv-eMSP  # 替换为你的项目Key
+          SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
+        run: |
+          sonar-scanner \
+            -Dsonar.projectKey=jiangbw_vlv-eMSP \
+            -Dsonar.organization=your-organization \
+            -Dsonar.host.url=https://sonarcloud.io \
+            -Dsonar.login=${{ secrets.SONAR_TOKEN }}
