@@ -54,7 +54,6 @@ jobs:
             -Dsonar.analysis.autoconfig.disabled=true
             -Dsonar.scm.disabled=false
             -Dsonar.scm.provider=git
-            -Dsonar.analysis.ci=GitHub Actions
             -Dsonar.autoconfig.disabled=true
             -Dsonar.projectKey=${{ secrets.SONAR_PROJECT_KEY }}
             -Dsonar.organization=${{ secrets.SONAR_ORGANIZATION }}
