@@ -34,3 +34,10 @@ jobs:
           java-version: '17'
           distribution: 'temurin'
           cache: 'maven'
+
+      - name: Build and test with Maven
+        run: mvn clean package
+        env:
+          SPRING_DATASOURCE_URL: jdbc:postgresql://localhost:5432/emsp
+          SPRING_DATASOURCE_USERNAME: postgres
+          SPRING_DATASOURCE_PASSWORD: postgres
