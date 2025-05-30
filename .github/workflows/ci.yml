@@ -48,7 +48,17 @@ jobs:
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
           SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
-
+        with:
+          args: >
+            -Dsonar.projectKey=${{ secrets.SONAR_PROJECT_KEY }}
+            -Dsonar.organization=${{ secrets.SONAR_ORGANIZATION }}
+            -Dsonar.ci.autoconfig.disabled=true
+            -Dsonar.analysis.autoconfig.disabled=true
+            -Dsonar.scm.provider=git
+            -Dsonar.branch.name=${{ github.ref_name }}
+            -Dsonar.branch.target=${{ github.base_ref || 'main' }}
+            -Dsonar.java.binaries=target/classes
+            -Dsonar.coverage.jacoco.xmlReportPaths=target/site/jacoco/jacoco.xml
       - name: Build Docker image
         run: |
           docker build -t emsp-service:ci-${{ github.sha }} .
