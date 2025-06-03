@@ -1,0 +1,21 @@
+post request: http://localhost:8080/api/cards/1/assign
+body
+{
+"accountEmail": "user@example.com"
+}
+
+response:
+{
+"cardId": 1,
+"status": "ASSIGNED",
+"assignedAt": "2025-06-03T21:09:37.872013",
+"account": {
+"email": "user@example.com",
+"contractId": "782519"
+},
+"emaid": "DE001A78251901",
+"links": {
+"accountDetails": "/api/accounts/user@example.com",
+"cardDetails": "/api/cards/1"
+}
+}

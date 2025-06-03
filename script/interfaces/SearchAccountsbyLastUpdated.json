@@ -1,0 +1,65 @@
+get request:
+http://localhost:8080/api/search?lastUpdated=2024-05-29T13:00:00&page=0&size=10
+
+response:
+{
+"content": [
+{
+"email": "user1@example.com",
+"contractId": "DE001A0001",
+"status": "ACTIVATED",
+"createdAt": "2025-06-03T18:22:48",
+"lastUpdated": "2025-06-03T18:22:48",
+"cards": []
+},
+{
+"email": "user2@example.com",
+"contractId": "DE001A0002",
+"status": "CREATED",
+"createdAt": "2025-06-03T18:22:48",
+"lastUpdated": "2025-06-03T18:22:48",
+"cards": []
+},
+{
+"email": "user3@example.com",
+"contractId": "FR002B0003",
+"status": "DEACTIVATED",
+"createdAt": "2025-06-03T18:22:48",
+"lastUpdated": "2025-06-03T18:22:48",
+"cards": []
+},
+{
+"email": "user@example.com",
+"contractId": "586662",
+"status": "ACTIVATED",
+"createdAt": "2025-06-03T20:27:04",
+"lastUpdated": "2025-06-03T20:28:12",
+"cards": []
+}
+],
+"pageable": {
+"pageNumber": 0,
+"pageSize": 10,
+"sort": {
+"empty": true,
+"unsorted": true,
+"sorted": false
+},
+"offset": 0,
+"unpaged": false,
+"paged": true
+},
+"totalElements": 4,
+"totalPages": 1,
+"last": true,
+"size": 10,
+"number": 0,
+"sort": {
+"empty": true,
+"unsorted": true,
+"sorted": false
+},
+"numberOfElements": 4,
+"first": true,
+"empty": false
+}

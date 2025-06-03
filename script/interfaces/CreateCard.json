@@ -1,0 +1,19 @@
+post request: http://localhost:8080/api/cards
+body
+{
+"uid": "550e8400-e29b-41d4-a716-446655440000",
+"visibleNumber": "CARD-1234"
+}
+
+response:
+{
+"id": 1,
+"uid": "550e8400-e29b-41d4-a716-446655440000",
+"visibleNumber": "CARD-1234",
+"emaid": null,
+"status": "CREATED",
+"account": null,
+"assignedAt": null,
+"createdAt": "2025-06-03T20:31:53.432471",
+"lastUpdated": "2025-06-03T20:31:53.432701"
+}

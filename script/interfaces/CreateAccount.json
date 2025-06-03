@@ -1,0 +1,20 @@
+post request: http://localhost:8080/api/accounts
+body
+{
+"email": "user@example.com"
+}
+
+response:
+{
+"id": 4,
+"email": "user@example.com",
+"contractId": "586662",
+"countryCode": "DE",
+"providerId": "001",
+"instance": "A",
+"nextServiceId": 1,
+"status": "CREATED",
+"createdAt": "2025-06-03T20:27:04.514328",
+"lastUpdated": "2025-06-03T20:27:04.514389",
+"cards": []
+}

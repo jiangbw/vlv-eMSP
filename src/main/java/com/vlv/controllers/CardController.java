@@ -2,10 +2,7 @@ package com.vlv.controllers;
 
 import com.vlv.entity.Card;
 import com.vlv.service.CardService;
-import com.vlv.vo.AccountStatusRequest;
-import com.vlv.vo.AssignRequest;
-import com.vlv.vo.CardRequest;
-import com.vlv.vo.CardStatusRequest;
+import com.vlv.vo.*;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
@@ -24,9 +21,9 @@ public class CardController {
     }
 
     @PostMapping("/{cardId}/assign")
-    public ResponseEntity<Card> assignCard(@PathVariable Long cardId, @RequestBody AssignRequest request) {
+    public ResponseEntity<CardAssignmentResponse> assignCard(@PathVariable Long cardId, @RequestBody AssignRequest request) {
         Card card = cardService.assignToAccount(cardId, request.getAccountEmail());
-        return ResponseEntity.ok(card);
+        return ResponseEntity.ok(new CardAssignmentResponse(card));
     }
 
     @PostMapping("/{cardId}/status")
