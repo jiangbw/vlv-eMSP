@@ -22,3 +22,15 @@ src/main/resources/db/EntityRelationshipDiagram.png
 
 5、CI （github）
 https://github.com/jiangbw/vlv-eMSP/actions
+
+6、deploy app to AWS
+note: 
+use Elastic Beanstalk
+1、create application
+2、create environment -> select web service environment -> set config 
+3、get URL Vlv-emsp-app-env.eba-czimup3y.eu-north-1.elasticbeanstalk.com 
+4、Manually upload jar to AWS
+
+7、 The problems encountered are:
+1. Accessing hub.docker.io requires a proxy
+2. Visa card required (create Azure account)
