@@ -1,7 +1,8 @@
 package com.vlv.service;
 
-import com.vlv.entity.Account;
-import com.vlv.repositories.AccountRepository;
+import com.vlv.domain.account.Account;
+import com.vlv.domain.account.AccountService;
+import com.vlv.domain.account.AccountRepository;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
@@ -27,7 +28,9 @@ class AccountServiceTest {
         savedAccount.setEmail("test@example.com");
         when(accountRepository.save(any())).thenReturn(savedAccount);
 
-        Account account = accountService.createAccount("test@example.com");
+        Account accountDto = new Account();
+        accountDto.setEmail("test@example.com");
+        Account account = accountService.createAccount(accountDto);
         assertNotNull(account);
         assertEquals("test@example.com", account.getEmail());
     }

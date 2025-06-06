@@ -17,6 +17,8 @@ git address：https://github.com/jiangbw/vlv-eMSP
 
 3、sql script
 src/main/resources/db/schema.sql
+4、RDBMS design
+src/main/resources/db/EntityRelationshipDiagram.png
 
-4、CI （github）
+5、CI （github）
 https://github.com/jiangbw/vlv-eMSP/actions
